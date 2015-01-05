@@ -1,0 +1,288 @@
+<html>
+<head>
+<title>Known Resolution Report</title>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="fixed_table_rc.js"></script>
+<link rel="stylesheet" type="text/css" href="fixed_table_rc.css" />
+<script type="text/javascript" charset="utf-8" src="verivo.js"></script>
+<style>
+    table.known-resolution-report .Folder        div { text-align:center; }
+    table.known-resolution-report .KRStatus      div {  text-align:center; }
+    table.known-resolution-report .Start         div {  text-align:center; }
+    table.known-resolution-report .End           div {  text-align:center; }
+    table.known-resolution-report .Condition     div {  text-align:left; }
+    table.known-resolution-report .Reason        div {  text-align:left; }
+    table.known-resolution-report .Device        div {  text-align:center; }
+    table.known-resolution-report .Code          div {  text-align:center; }
+    table.known-resolution-report .Person        div {  text-align:center; }
+    table.known-resolution-report .HHMember      div {  text-align:center; }
+    table.known-resolution-report .SU            div {  text-align:center; }
+    table.known-resolution-report .HU            div {  text-align:center; }
+    table.known-resolution-report .InternetHrs   div {  text-align:center; }
+    table.known-resolution-report .Description   div {  text-align:left; }
+
+    table.known-resolution-report td.Folder      { background: white;  }
+    table.known-resolution-report td.KRStatus    { background: white;  }
+    table.known-resolution-report td.Start       { background: white;  }
+    table.known-resolution-report td.End         { background: white;  }
+    table.known-resolution-report td.Condition   { background: white;  }
+    table.known-resolution-report td.Reason      { background: white;  }
+    table.known-resolution-report td.Device      { background: white;  }
+    table.known-resolution-report td.Code        { background: white;  }
+    table.known-resolution-report td.Person      { background: white;  }
+    table.known-resolution-report td.HHMember    { background: white;  }
+    table.known-resolution-report td.SU          { background: white;  }
+    table.known-resolution-report td.HU          { background: white;  }
+    table.known-resolution-report td.InternetHrs { background: white;  }
+    table.known-resolution-report td.Description { background: white;  }
+
+    #status {
+        background:white;
+        border-top:solid 2px #888;
+        bottom:12;
+        left:0;
+        margin:0;
+        padding:0;
+        position:fixed;
+        width:100%;
+    }
+
+    #status div {
+        margin:0;
+        padding:3px;
+        text-align:center;
+    }
+</style>
+<script>
+var jqueryFormatTable;
+
+$().ready(function() {
+    jqueryFormatTable = function() {
+        $('#table-known-resolution-report').fxdHdrCol({
+            fixedCols:  1,
+            width:     "100%",
+            height:    "100%",
+            colModal: [
+                { width: 100, align: 'center' },
+                { width: 60, align: 'center' },
+                { width: 60, align: 'center' },
+                { width: 60, align: 'center' },
+                { width: 110, align: 'left' },
+                { width: 250, align: 'left' },
+                { width: 50, align: 'center' },
+                { width: 50, align: 'center' },
+                { width: 60, align: 'center' },
+                { width: 60, align: 'center' },
+                { width: 30, align: 'center' },
+                { width: 30, align: 'center' },
+                { width: 70, align: 'center' },
+                { width: 200, align: 'left' }
+            ],
+            sort: false
+        });
+    }
+
+    $('#table-known-resolution-report').fxdHdrCol({
+        fixedCols:  1,
+        width:     "100%",
+        height:    "100%",
+        colModal: [
+            { width: 100, align: 'center' },
+            { width: 60, align: 'center' },
+            { width: 60, align: 'center' },
+            { width: 60, align: 'center' },
+            { width: 110, align: 'left' },
+            { width: 250, align: 'left' },
+            { width: 50, align: 'center' },
+            { width: 50, align: 'center' },
+            { width: 60, align: 'center' },
+            { width: 60, align: 'center' },
+            { width: 30, align: 'center' },
+            { width: 30, align: 'center' },
+            { width: 70, align: 'center' },
+            { width: 200, align: 'left' }
+        ],
+        sort: false
+    });
+});
+
+var callbackCount = 0;
+var timerAction = 0;
+var KnownResolutionReport;
+
+//Listening to deviceready event. This ensures that all Cordova and Verivo's platform APIs are ready to use
+document.addEventListener("deviceready", onDeviceReady, false);
+
+function loadBody() {
+}
+
+function onDeviceReady() {
+    verivo.getListData(GetKnownResolutionReportList, onError, "Known Resolution Report List", "Known Resolution Report List", []);
+}
+
+function onSuccess(result) {
+
+}
+
+function onError(error) {
+    alert(error.errorMessage);
+}
+
+function LoadTable() {
+    var table = document.getElementById("known-resolution-report");
+
+    var statusbar = document.getElementById("status");
+    if(KnownResolutionReport.length == 0) {
+        statusbar.innerHTML = 'No Records Found'
+    } else {
+        statusbar.style.display = 'none';
+    }
+
+    var cell_Folder;
+    var cell_KRStatus;
+    var cell_Start;
+    var cell_End;
+    var cell_Condition;
+    var cell_Reason;
+    var cell_Device;
+    var cell_Code;
+    var cell_Person;
+    var cell_HHMember;
+    var cell_SU;
+    var cell_HU;
+    var cell_InternetHrs;
+    var cell_Description;
+
+    var tr;
+
+    var tbody = document.getElementById("known-resolution-report");
+    for(var i = 0; i < KnownResolutionReport.length; i++) {
+        tr = document.createElement("tr");
+
+        var d_effStart_utcSeconds = KnownResolutionReport[i].d_effStart/10000000 - 62135596800;
+        var d_effStart = new Date(0);
+        d_effStart.setUTCSeconds(d_effStart_utcSeconds);
+
+        var d_effStart_string = d_effStart.getMonth()+1 + '/' + d_effStart.getDate() + '/' + d_effStart.getFullYear()
+
+        var d_effEnd_utcSeconds = KnownResolutionReport[i].d_effEnd/10000000 - 62135596800;
+        var d_effEnd = new Date(0);
+        d_effEnd.setUTCSeconds(d_effEnd_utcSeconds);
+
+        var d_effEnd_string = d_effEnd.getMonth()+1 + '/' + d_effEnd.getDate() + '/' + d_effEnd.getFullYear()
+
+        cell_Folder = document.createElement("td");
+        cell_Folder.className = "Folder";
+        cell_Folder.appendChild(document.createTextNode(KnownResolutionReport[i].i_fldr));
+        tr.appendChild(cell_Folder);
+
+        cell_KRStatus = document.createElement("td");
+        cell_KRStatus.className = "KRStatus";
+        cell_KRStatus.appendChild(document.createTextNode(KnownResolutionReport[i].rStatus));
+        tr.appendChild(cell_KRStatus);
+
+        cell_Start = document.createElement("td");
+        cell_Start.className = "Start";
+        cell_Start.appendChild(document.createTextNode(d_effStart_string));
+        tr.appendChild(cell_Start);
+
+        cell_End = document.createElement("td");
+        cell_End.className = "End";
+        cell_End.appendChild(document.createTextNode(d_effEnd_string));
+        tr.appendChild(cell_End);
+
+        cell_Condition = document.createElement("td");
+        cell_Condition.className = "Condition";
+        cell_Condition.appendChild(document.createTextNode(KnownResolutionReport[i].fltCondition));
+        tr.appendChild(cell_Condition);
+
+        cell_Reason = document.createElement("td");
+        cell_Reason.className = "Reason";
+        cell_Reason.appendChild(document.createTextNode(KnownResolutionReport[i].kComment));
+        tr.appendChild(cell_Reason);
+
+        cell_Device = document.createElement("td");
+        cell_Device.className = "Device";
+        cell_Device.appendChild(document.createTextNode(KnownResolutionReport[i].l_dvc));
+        tr.appendChild(cell_Device);
+
+        cell_Code = document.createElement("td");
+        cell_Code.className = "Code";
+        cell_Code.appendChild(document.createTextNode(KnownResolutionReport[i].Code));
+        tr.appendChild(cell_Code);
+
+        cell_Person = document.createElement("td");
+        cell_Person.className = "Person";
+        cell_Person.appendChild(document.createTextNode(KnownResolutionReport[i].i_prsn));
+        tr.appendChild(cell_Person);
+
+        cell_HHMember = document.createElement("td");
+        cell_HHMember.className = "HHMember";
+        cell_HHMember.appendChild(document.createTextNode(KnownResolutionReport[i].First + ' ' + KnownResolutionReport[i].Last));
+        tr.appendChild(cell_HHMember);
+
+        cell_SU = document.createElement("td");
+        cell_SU.className = "SU";
+        cell_SU.appendChild(document.createTextNode(KnownResolutionReport[i].SU));
+        tr.appendChild(cell_SU);
+
+        cell_HU = document.createElement("td");
+        cell_HU.className = "HU";
+        cell_HU.appendChild(document.createTextNode(KnownResolutionReport[i].HU));
+        tr.appendChild(cell_HU);
+
+        cell_InternetHrs = document.createElement("td");
+        cell_InternetHrs.className = "InternetHrs";
+        cell_InternetHrs.appendChild(document.createTextNode(KnownResolutionReport[i].ihrs));
+        tr.appendChild(cell_InternetHrs);
+
+        cell_Description = document.createElement("td");
+        cell_Description.className = "Description";
+        cell_Description.appendChild(document.createTextNode(KnownResolutionReport[i].kDescription));
+        tr.appendChild(cell_Description);
+
+        tbody.appendChild(tr);
+    }
+
+    jqueryFormatTable();
+}
+
+function GetKnownResolutionReportList(result) {
+    callbackCount++;
+    KnownResolutionReport = result;
+    var statusbar = document.getElementById("status");
+    statusbar.innerHTML = 'Formatting table...'
+    LoadTable();
+}
+</script>
+<meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<table class="known-resolution-report" id="table-known-resolution-report">
+    <thead>
+    <tr>
+        <th>Folder</th>
+        <th>KR Status</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Condition</th>
+        <th>Reason</th>
+        <th>Device</th>
+        <th>Code</th>
+        <th>Person</th>
+        <th>HH Member</th>
+        <th>SU</th>
+        <th>HU</th>
+        <th>Internet Hrs</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody id="known-resolution-report"></tbody>
+</table>
+<div id="status">
+    <div>
+        No Records Found
+    </div>
+</div>
+</body>
+</html>
