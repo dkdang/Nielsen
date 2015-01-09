@@ -9862,52 +9862,82 @@ function UpdateSelectControls(callbackTotal, AddFirstOption) {
 var SaveFirstFlag = 1;
 
 function Save() {
-    SaveFirstFlag = 1;
+    var Results = document.forms["FormOpenWorksFilter"]["SelectResults"].value;
 
-    var SQL = 'SELECT i_fldr FROM na2_usp_iphone_Get_OpenWork WHERE';
+    if(Results == "List") {
+        SaveFirstFlag = 1;
 
-    var c_SRs = GetCSRS();
-    var SelectMQSReps = GetSelectControl("FormOpenWorksFilter", "SelectMQSReps", "sapNo");
-    var SelectDueWeek = GetSelectControl("FormOpenWorksFilter", "SelectDueWeek", "dueweek");
-    var SelectCounty = GetSelectControl("FormOpenWorksFilter", "SelectCounty", "County");
-    var SelectMeterType = GetSelectControl("FormOpenWorksFilter", "SelectMeterType", "c_MeterType");
-    var SelectScheduled = GetSelectControl("FormOpenWorksFilter", "SelectScheduled", "i_scheduled");
-    var SelectFieldArea = GetSelectControl("FormOpenWorksFilter", "SelectFieldArea", "i_fldarea");
-    var SelectFieldOffice = GetSelectControl("FormOpenWorksFilter", "SelectFieldOffice", "n_fldofc");
-    var SelectFaultedYesterday = GetSelectControl("FormOpenWorksFilter", "SelectFaultedYesterday", "c_NGYest");
-    var CheckboxFavorite = GetCheckboxControl("FormOpenWorksFilter", "Favorite", "b_preferred")
+        var SQL = 'SELECT i_fldr FROM na2_usp_iphone_Get_OpenWork WHERE';
 
-    //alert(CheckboxFavorite);
+        var c_SRs = GetCSRS('SQL');
+        var SelectMQSReps = GetSelectControl("FormOpenWorksFilter", "SelectMQSReps", "sapNo", "SQL", 1, 'String');
+        var SelectDueWeek = GetSelectControl("FormOpenWorksFilter", "SelectDueWeek", "dueweek", "SQL", 1, 'String');
+        var SelectCounty = GetSelectControl("FormOpenWorksFilter", "SelectCounty", "County", "SQL", 1, 'String');
+        var SelectMeterType = GetSelectControl("FormOpenWorksFilter", "SelectMeterType", "c_MeterType", "SQL", 1, 'String');
+        var SelectScheduled = GetSelectControl("FormOpenWorksFilter", "SelectScheduled", "i_scheduled", "SQL", 1, 'String');
+        var SelectFieldArea = GetSelectControl("FormOpenWorksFilter", "SelectFieldArea", "i_fldarea", "SQL", 1, 'String');
+        var SelectFieldOffice = GetSelectControl("FormOpenWorksFilter", "SelectFieldOffice", "n_fldofc", "SQL", 1, 'String');
+        var SelectFaultedYesterday = GetSelectControl("FormOpenWorksFilter", "SelectFaultedYesterday", "c_NGYest", "SQL", 1, 'String');
+        var CheckboxFavorite = GetCheckboxControl("FormOpenWorksFilter", "Favorite", "b_preferred", "SQL");
 
-    if(c_SRs.length > 0) {
-        SQL = SQL + " (" + c_SRs + " )";
-        SaveFirstFlag = 0;
+        //alert(c_SRs);
+
+        if(c_SRs.length > 0) {
+            SQL = SQL + " (" + c_SRs + " )";
+            SaveFirstFlag = 0;
+        }
+
+        SQL = UpdateSQL(SQL, SelectMQSReps);
+        SQL = UpdateSQL(SQL, SelectDueWeek);
+        SQL = UpdateSQL(SQL, SelectCounty);
+        SQL = UpdateSQL(SQL, SelectMeterType);
+        SQL = UpdateSQL(SQL, SelectScheduled);
+        SQL = UpdateSQL(SQL, SelectFieldArea);
+        SQL = UpdateSQL(SQL, SelectFieldOffice);
+        SQL = UpdateSQL(SQL, SelectFaultedYesterday);
+        SQL = UpdateSQL(SQL, CheckboxFavorite);
+
+
+        if(SaveFirstFlag.valueOf(1)) {
+            SQL = 'SELECT i_fldr FROM na2_usp_iphone_Get_OpenWork';
+        } else {
+            SQL = SQL + ')';
+        }
+
+        //alert(SQL);
+
+        var navigationJSONObject = {
+            "filterFields" : [   {"Filter": SQL}  ]
+        };
+
+        verivo.navigate(onSuccessNavigate, onError, "Open Work Filtered List", "Open Work Filtered List", navigationJSONObject);
+    } else if(Results == 'Map') {
+        var c_SRs = GetCSRS('List');
+        var SelectMQSReps = GetSelectControl("FormOpenWorksFilter", "SelectMQSReps", "sapNo", "List", 0, 'String');
+        var SelectDueWeek = GetSelectControl("FormOpenWorksFilter", "SelectDueWeek", "dueweek", "List", 01, 'String');
+        var SelectCounty = GetSelectControl("FormOpenWorksFilter", "SelectCounty", "County", "List", 0, 'String');
+        var SelectMeterType = GetSelectControl("FormOpenWorksFilter", "SelectMeterType", "c_MeterType", "List", 0, 'String');
+        var SelectScheduled = GetSelectControl("FormOpenWorksFilter", "SelectScheduled", "i_scheduled", "List", 0, 'String');
+        var SelectFieldArea = GetSelectControl("FormOpenWorksFilter", "SelectFieldArea", "i_fldarea", "List", 0, 'Integer');
+        var SelectFieldOffice = GetSelectControl("FormOpenWorksFilter", "SelectFieldOffice", "n_fldofc", "List", 0, 'String');
+        var SelectFaultedYesterday = GetSelectControl("FormOpenWorksFilter", "SelectFaultedYesterday", "c_NGYest", "List", 0, 'String');
+        var CheckboxFavorite = GetCheckboxControl("FormOpenWorksFilter", "Favorite", "b_preferred", "List");
+
+        var navigationJSONObject = {
+            "filterFields" : [   {"Input_c_SRs": c_SRs},
+                {"Input_MQSReps":SelectMQSReps},
+                {"Input_dueweek":SelectDueWeek},
+                {"Input_County":SelectCounty},
+                {"Input_c_MeterType":SelectMeterType},
+                {"Input_i_scheduled":SelectScheduled},
+                {"Input_i_fldarea":SelectFieldArea},
+                {"Input_n_fldofc":SelectFieldOffice},
+                {"Input_c_NGYest":SelectFaultedYesterday},
+                {"Input_b_preferred":CheckboxFavorite}  ]
+        };
+
+        verivo.navigate(onSuccessNavigate, onError, "Open Work Maps (Filter)", "Open Work Maps (Filter)", navigationJSONObject);
     }
-
-    SQL = UpdateSQL(SQL, SelectMQSReps);
-    SQL = UpdateSQL(SQL, SelectDueWeek);
-    SQL = UpdateSQL(SQL, SelectCounty);
-    SQL = UpdateSQL(SQL, SelectMeterType);
-    SQL = UpdateSQL(SQL, SelectScheduled);
-    SQL = UpdateSQL(SQL, SelectFieldArea);
-    SQL = UpdateSQL(SQL, SelectFieldOffice);
-    SQL = UpdateSQL(SQL, SelectFaultedYesterday);
-    SQL = UpdateSQL(SQL, CheckboxFavorite);
-
-
-    if(SaveFirstFlag.valueOf(1)) {
-        SQL = 'SELECT i_fldr FROM na2_usp_iphone_Get_OpenWork';
-    } else {
-        SQL = SQL + ')';
-    }
-
-    //alert(SQL);
-
-    var navigationJSONObject = {
-        "filterFields" : [   {"Filter": SQL}  ]
-    };
-
-    verivo.navigate(onSuccessNavigate, onError, "Open Work Filtered List", "Open Work Filtered List", navigationJSONObject);
 }
 
 function UpdateSQL(SQL, Value) {
@@ -9924,7 +9954,7 @@ function UpdateSQL(SQL, Value) {
     return SQL;
 }
 
-function GetCSRS() {
+function GetCSRS(returnType) {
     var FlagServiceRequestType = IsControlSelected("FormOpenWorksFilter", "SelectServiceRequestType");
     var FlagDueDateMonth = IsControlSelected("FormOpenWorksFilter", "SelectDueDateMonth");
     var FlagDueDateYear = IsControlSelected("FormOpenWorksFilter", "SelectDueDateYear");
@@ -9953,13 +9983,24 @@ function GetCSRS() {
                             SelectDueDateYearValue = Form["SelectDueDateYear"][z].value;
 
                             if(Form["SelectDueDateYear"][z].selected &&  SelectDueDateYearValue.length > 0) {
-                                if(FirstFlag == 1) {
-                                    FirstFlag = 0;
-                                } else {
-                                    SelectValue = SelectValue + " OR ";
+                                if(returnType == 'SQL') {
+                                    if(FirstFlag == 1) {
+                                        FirstFlag = 0;
+                                    } else {
+                                        SelectValue = SelectValue + " OR ";
+                                    }
+
+                                    SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue + SelectDueDateMonthValue + SelectDueDateYearValue + '%"';
+                                } else if(returnType == 'List') {
+                                    if(FirstFlag == 1) {
+                                        FirstFlag = 0;
+                                    } else {
+                                        SelectValue = SelectValue + ",";
+                                    }
+
+                                    SelectValue = SelectValue + "'" + SelectServiceRequestTypeValue + SelectDueDateMonthValue + SelectDueDateYearValue + "%'";
                                 }
 
-                                SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue + SelectDueDateMonthValue + SelectDueDateYearValue + '%"';
                             }
                         }
                     }
@@ -9978,13 +10019,23 @@ function GetCSRS() {
                     SelectDueDateMonthValue = Form["SelectDueDateMonth"][y].value;
 
                     if (Form["SelectDueDateMonth"][y].selected && SelectDueDateMonthValue.length > 0) {
-                        if(FirstFlag == 1) {
-                            FirstFlag = 0;
-                        } else {
-                            SelectValue = SelectValue + " OR ";
-                        }
+                        if(returnType == 'SQL') {
+                            if(FirstFlag == 1) {
+                                FirstFlag = 0;
+                            } else {
+                                SelectValue = SelectValue + " OR ";
+                            }
 
-                        SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue + SelectDueDateMonthValue + '%"';
+                            SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue + SelectDueDateMonthValue + '%"';
+                        } else if(returnType == 'List') {
+                            if(FirstFlag == 1) {
+                                FirstFlag = 0;
+                            } else {
+                                SelectValue = SelectValue + ",";
+                            }
+
+                            SelectValue = SelectValue + "'" + SelectServiceRequestTypeValue + SelectDueDateMonthValue + "%'";
+                        }
                     }
                 }
             }
@@ -10001,13 +10052,23 @@ function GetCSRS() {
                     SelectDueDateYearValue = Form["SelectDueDateYear"][z].value;
 
                     if(Form["SelectDueDateYear"][z].selected &&  SelectDueDateYearValue.length > 0) {
-                        if(FirstFlag == 1) {
-                            FirstFlag = 0;
-                        } else {
-                            SelectValue = SelectValue + " OR ";
-                        }
+                        if(returnType == 'SQL') {
+                            if(FirstFlag == 1) {
+                                FirstFlag = 0;
+                            } else {
+                                SelectValue = SelectValue + " OR ";
+                            }
 
-                        SelectValue = SelectValue + ' c_SRs LIKE "%' + SelectDueDateMonthValue + SelectDueDateYearValue + '"';
+                            SelectValue = SelectValue + ' c_SRs LIKE "%' + SelectDueDateMonthValue + SelectDueDateYearValue + '"';
+                        } else if(returnType == 'List') {
+                            if(FirstFlag == 1) {
+                                FirstFlag = 0;
+                            } else {
+                                SelectValue = SelectValue + ",";
+                            }
+
+                            SelectValue = SelectValue + "'" + SelectDueDateMonthValue + SelectDueDateYearValue + "'";
+                        }
                     }
                 }
             }
@@ -10024,13 +10085,23 @@ function GetCSRS() {
                     SelectDueDateYearValue = Form["SelectDueDateYear"][z].value;
 
                     if(Form["SelectDueDateYear"][z].selected &&  SelectDueDateYearValue.length > 0) {
-                        if(FirstFlag == 1) {
-                            FirstFlag = 0;
-                        } else {
-                            SelectValue = SelectValue + " OR ";
-                        }
+                        if(returnType == 'SQL') {
+                            if(FirstFlag == 1) {
+                                FirstFlag = 0;
+                            } else {
+                                SelectValue = SelectValue + " OR ";
+                            }
 
-                        SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue + "___" +SelectDueDateYearValue + '%"';
+                            SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue + "___" +SelectDueDateYearValue + '%"';
+                        } else if(returnType == 'List') {
+                            if(FirstFlag == 1) {
+                                FirstFlag = 0;
+                            } else {
+                                SelectValue = SelectValue + ",";
+                            }
+
+                            SelectValue = SelectValue + "'" + SelectServiceRequestTypeValue + "___" +SelectDueDateYearValue + "%'";
+                        }
                     }
                 }
             }
@@ -10043,13 +10114,23 @@ function GetCSRS() {
             SelectServiceRequestTypeValue = Form["SelectServiceRequestType"][x].value;
 
             if (Form["SelectServiceRequestType"][x].selected && SelectServiceRequestTypeValue.length > 0) {
-                if(FirstFlag == 1) {
-                    FirstFlag = 0;
-                } else {
-                    SelectValue = SelectValue + " OR ";
-                }
+                if(returnType == 'SQL') {
+                    if(FirstFlag == 1) {
+                        FirstFlag = 0;
+                    } else {
+                        SelectValue = SelectValue + " OR ";
+                    }
 
-                SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue+ '%"';
+                    SelectValue = SelectValue + ' c_SRs LIKE "' + SelectServiceRequestTypeValue+ '%"';
+                } else if(returnType == 'List') {
+                    if(FirstFlag == 1) {
+                        FirstFlag = 0;
+                    } else {
+                        SelectValue = SelectValue + ",";
+                    }
+
+                    SelectValue = SelectValue + "'" + SelectServiceRequestTypeValue+ "%'";
+                }
             }
         }
     }
@@ -10060,13 +10141,23 @@ function GetCSRS() {
             SelectDueDateMonthValue = Form["SelectDueDateMonth"][y].value;
 
             if (Form["SelectDueDateMonth"][y].selected && SelectDueDateMonthValue.length > 0) {
-                if(FirstFlag == 1) {
-                    FirstFlag = 0;
-                } else {
-                    SelectValue = SelectValue + " OR ";
-                }
+                if(returnType == 'SQL') {
+                    if(FirstFlag == 1) {
+                        FirstFlag = 0;
+                    } else {
+                        SelectValue = SelectValue + " OR ";
+                    }
 
-                SelectValue = SelectValue + ' c_SRs LIKE "%' + SelectDueDateMonthValue+ '%"';
+                    SelectValue = SelectValue + ' c_SRs LIKE "%' + SelectDueDateMonthValue+ '%"';
+                } else if(returnType == 'List') {
+                    if(FirstFlag == 1) {
+                        FirstFlag = 0;
+                    } else {
+                        SelectValue = SelectValue + ",";
+                    }
+
+                    SelectValue = SelectValue + "'" + SelectDueDateMonthValue+ "%'";
+                }
             }
         }
     }
@@ -10075,13 +10166,23 @@ function GetCSRS() {
             SelectDueDateYearValue = Form["SelectDueDateYear"][z].value;
 
             if(Form["SelectDueDateYear"][z].selected &&  SelectDueDateYearValue.length > 0) {
-                if(FirstFlag == 1) {
-                    FirstFlag = 0;
-                } else {
-                    SelectValue = SelectValue + " OR ";
-                }
+                if(returnType == 'SQL') {
+                    if(FirstFlag == 1) {
+                        FirstFlag = 0;
+                    } else {
+                        SelectValue = SelectValue + " OR ";
+                    }
 
-                SelectValue = SelectValue + ' c_SRs LIKE "%' + SelectDueDateYearValue + '%"';
+                    SelectValue = SelectValue + ' c_SRs LIKE "%' + SelectDueDateYearValue + '%"';
+                } else if(returnType == 'List') {
+                    if(FirstFlag == 1) {
+                        FirstFlag = 0;
+                    } else {
+                        SelectValue = SelectValue + ",";
+                    }
+
+                    SelectValue = SelectValue + "'" + SelectDueDateYearValue + "%'";
+                }
             }
         }
     }
@@ -10116,24 +10217,37 @@ function BooleanToString(value) {
     }
 }
 
-function GetCheckboxControl(FormName, SelectControlName, ColumnName) {
+function GetCheckboxControl(FormName, SelectControlName, ColumnName, ResultType) {
     var Form = document.forms[FormName];
     var Value = "";
 
     if (Form[SelectControlName].checked == true) {
-        Value = ' b_preferred = "1"'
+        if(ResultType == 'SQL') {
+            Value = ' b_preferred = "1"'
+        } else if (ResultType = 'List') {
+            Value = "1";
+        }
+
     }
 
     return Value;
 }
 
-function GetSelectControl(FormName, SelectControlName, ColumnName) {
+function GetSelectControl(FormName, SelectControlName, ColumnName, ResultType, AddWildcard, DataType) {
     var FirstFlag = 1;
 
     var Form = document.forms[FormName];
     var SelectValue = "";
     var x = 0;
     var value;
+    var wildcard;
+    var apos;
+
+    if(AddWildcard == 1) wildcard = '%'
+    else wildcard = '';
+
+    if(DataType == 'String') apos = "'";
+    else if(DataType == 'Integer') apos = "";
 
     for (x=0;x<Form[SelectControlName].length;x++)
     {
@@ -10141,13 +10255,24 @@ function GetSelectControl(FormName, SelectControlName, ColumnName) {
 
         if(Form[SelectControlName][x].selected && value.length > 0)
         {
-            if(FirstFlag == 1) {
-                FirstFlag = 0;
-            } else {
-                SelectValue = SelectValue + " OR ";
+            if(ResultType == 'SQL') {
+                if(FirstFlag == 1) {
+                    FirstFlag = 0;
+                } else {
+                    SelectValue = SelectValue + " OR ";
+                }
+
+                SelectValue = SelectValue + ' ' + ColumnName + ' LIKE "' + Form[SelectControlName][x].value + '%"';
+            } else if (ResultType == 'List') {
+                if(FirstFlag == 1) {
+                    FirstFlag = 0;
+                } else {
+                    SelectValue = SelectValue + ",";
+                }
+
+                SelectValue = SelectValue + apos + Form[SelectControlName][x].value + wildcard + apos;
             }
 
-            SelectValue = SelectValue + ' ' + ColumnName + ' LIKE "' + Form[SelectControlName][x].value + '%"';
         }
     }
 
@@ -10391,6 +10516,17 @@ function LoadOpenWorkFilter(selection) {
             <td>
                 <select id="SelectOpenWorkFilter" class="select-single" title = "Filer" onchange="LoadOpenWorkFilter(this)">
                     <option value="">[Select]</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <table class="table-two-column">
+        <tr>
+            <td><label>Display Results as:</label></td>
+            <td>
+                <select id="SelectResults" class="select-single" title = "Results">
+                    <option value="List" selected="selected">List</option>
+                    <option value="Map">Map</option>
                 </select>
             </td>
         </tr>
