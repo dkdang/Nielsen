@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Add Contact/Add Contact.iml" filepath="$PROJECT_DIR$/Add Contact/Add Contact.iml" />
       <module fileurl="file://$PROJECT_DIR$/Best Time to Call Summary/Best Time to Call Summary.iml" filepath="$PROJECT_DIR$/Best Time to Call Summary/Best Time to Call Summary.iml" />
       <module fileurl="file://$PROJECT_DIR$/Dynamic Chocie List/Dynamic Chocie List.iml" filepath="$PROJECT_DIR$/Dynamic Chocie List/Dynamic Chocie List.iml" />
       <module fileurl="file://$PROJECT_DIR$/General Transfer - Verify Transaction/General Transfer - Verify Transaction.iml" filepath="$PROJECT_DIR$/General Transfer - Verify Transaction/General Transfer - Verify Transaction.iml" />
@@ -13,7 +14,7 @@
       <module fileurl="file://$PROJECT_DIR$/Nielsen.iml" filepath="$PROJECT_DIR$/Nielsen.iml" />
       <module fileurl="file://$PROJECT_DIR$/Open Works Filter/Open Works Filter.iml" filepath="$PROJECT_DIR$/Open Works Filter/Open Works Filter.iml" />
       <module fileurl="file://$PROJECT_DIR$/Sync/Sync.iml" filepath="$PROJECT_DIR$/Sync/Sync.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Weekly Summary/Weekly Summary.iml" filepath="$PROJECT_DIR$/Weekly Summary/Weekly Summary.iml" />
     </modules>
   </component>
 </project>
-
