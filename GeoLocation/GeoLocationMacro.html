@@ -2,7 +2,8 @@
 <html lang="en" >
 <head>
 <meta charset="utf-8" />
-<title>Geolocation</title>
+<title>Geolocation Macro</title>
+
 <!--<script type="text/javascript" charset="utf-8" src="verivo.js"></script>-->
 <script>
     if (navigator.userAgent.match(/Android/i)) {
@@ -114,39 +115,28 @@
 
     };
 </script>
+
 <script>
-//Listening to deviceready event. This ensures that all Cordova and Verivo's platform APIs are ready to use
-document.addEventListener("deviceready", onDeviceReady, false);
+    //Listening to deviceready event. This ensures that all Cordova and Verivo's platform APIs are ready to use
+    document.addEventListener("deviceready", onDeviceReady, false);
 
-function loadBody() {
-}
+    function loadBody() {
+    }
 
-function onDeviceReady() {
-    alert('getting location');
-    navigator.geolocation.getCurrentPosition(
-            geolocationSuccess,
-            geolocationError,
-            { maximumAge: 3000, timeout: 5000, enableHighAccuracy: false });
+    function onDeviceReady() {
+        verivo.getMacroValue(onGetMacroSuccess,onError,"Geolocation Test","Geolocation Test","#PyxLat#");
+    }
 
-    checkConnection();
-}
+    function onGetMacroSuccess (value) {
+        //Value returns the macro value
+        alert(value);
+    }
 
-function geolocationSuccess(position) {
-    alert('Latitude: '          + position.coords.latitude          + '\n' +
-            'Longitude: '         + position.coords.longitude         + '\n' +
-            'Altitude: '          + position.coords.altitude          + '\n' +
-            'Accuracy: '          + position.coords.accuracy          + '\n' +
-            'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-            'Heading: '           + position.coords.heading           + '\n' +
-            'Speed: '             + position.coords.speed             + '\n' +
-            'Timestamp: '         + position.timestamp                + '\n');
-};
-
-function geolocationError(error) {
-    alert(error.message);
-}
+    function onError(error) {
+        alert(error.message);
+    }
 </script>
-</head>
+
 <body onLoad="loadBody();"  >
 </body>
 </html>

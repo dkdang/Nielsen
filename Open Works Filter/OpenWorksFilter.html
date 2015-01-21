@@ -9729,6 +9729,7 @@
 <script>
 var callbackCount = 0;
 var OpenWorkFilter;
+var timerAction;
 
 //Listening to deviceready event. This ensures that all Cordova and Verivo's platform APIs are ready to use
 document.addEventListener("deviceready", onDeviceReady, false);
@@ -9863,6 +9864,7 @@ var SaveFirstFlag = 1;
 
 function Save() {
     var Results = document.forms["FormOpenWorksFilter"]["SelectResults"].value;
+    var callbackTotal;
 
     if(Results == "List") {
         SaveFirstFlag = 1;
@@ -9910,7 +9912,94 @@ function Save() {
             "filterFields" : [   {"Filter": SQL}  ]
         };
 
-        verivo.navigate(onSuccessNavigate, onError, "Open Work Filtered List", "Open Work Filtered List", navigationJSONObject);
+        //Get filter values again to pass into the map view
+        c_SRs = GetCSRS('SQL');
+        SelectMQSReps = GetSelectControl("FormOpenWorksFilter", "SelectMQSReps", "sapNo", "List", 0, 'String');
+        SelectDueWeek = GetSelectControl("FormOpenWorksFilter", "SelectDueWeek", "dueweek", "List", 01, 'String');
+        SelectCounty = GetSelectControl("FormOpenWorksFilter", "SelectCounty", "County", "List", 0, 'String');
+        SelectMeterType = GetSelectControl("FormOpenWorksFilter", "SelectMeterType", "c_MeterType", "List", 0, 'String');
+        SelectScheduled = GetSelectControl("FormOpenWorksFilter", "SelectScheduled", "i_scheduled", "List", 0, 'String');
+        SelectFieldArea = GetSelectControl("FormOpenWorksFilter", "SelectFieldArea", "i_fldarea", "List", 0, 'Integer');
+        SelectFieldOffice = GetSelectControl("FormOpenWorksFilter", "SelectFieldOffice", "n_fldofc", "List", 0, 'String');
+        SelectFaultedYesterday = GetSelectControl("FormOpenWorksFilter", "SelectFaultedYesterday", "c_NGYest", "List", 0, 'String');
+        CheckboxFavorite = GetCheckboxControl("FormOpenWorksFilter", "Favorite", "b_preferred", "List");
+
+       //Reset the call back counter
+        callbackCount = 0;
+        callbackTotal = 0;
+
+        if(c_SRs.length > 0) {
+            verivo.setControlValue(Updatec_SRsSuccess(), onError, "Open Work Filters", "Open Work Filters", "c_SRs", c_SRs);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(Updatec_SRsSuccess(), onError, "Open Work Filters", "Open Work Filters", "c_SRs", "");
+        }
+
+        if(SelectMQSReps.length > 0) {
+            verivo.setControlValue(UpdateMQSRepsSuccess(), onError, "Open Work Filters", "Open Work Filters", "MQSReps", SelectMQSReps);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateMQSRepsSuccess(), onError, "Open Work Filters", "Open Work Filters", "MQSReps", "");
+        }
+
+        if(SelectDueWeek.length > 0) {
+            verivo.setControlValue(UpdateDueWeekSuccess(), onError, "Open Work Filters", "Open Work Filters", "DueWeek", SelectDueWeek);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateDueWeekSuccess(), onError, "Open Work Filters", "Open Work Filters", "DueWeek", "");
+        }
+
+        if(SelectCounty.length > 0) {
+            verivo.setControlValue(UpdateCountySuccess(), onError, "Open Work Filters", "Open Work Filters", "County", SelectCounty);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateCountySuccess(), onError, "Open Work Filters", "Open Work Filters", "County", "");
+        }
+
+        if(SelectMeterType.length > 0) {
+            verivo.setControlValue(UpdateMeterTypeSuccess(), onError, "Open Work Filters", "Open Work Filters", "MeterType", SelectMeterType);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateMeterTypeSuccess(), onError, "Open Work Filters", "Open Work Filters", "MeterType", "");
+        }
+
+        if(SelectScheduled.length > 0) {
+            verivo.setControlValue(UpdateScheduledSuccess(), onError, "Open Work Filters", "Open Work Filters", "Scheduled", SelectScheduled);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateScheduledSuccess(), onError, "Open Work Filters", "Open Work Filters", "Scheduled", "");
+        }
+
+        if(SelectFieldArea.length > 0) {
+            verivo.setControlValue(UpdateFieldAreaSuccess(), onError, "Open Work Filters", "Open Work Filters", "FieldArea", SelectFieldArea);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateFieldAreaSuccess(), onError, "Open Work Filters", "Open Work Filters", "FieldArea", "");
+        }
+
+        if(SelectFieldOffice.length > 0) {
+            verivo.setControlValue(UpdateFieldOfficeSuccess(), onError, "Open Work Filters", "Open Work Filters", "FieldOffice", SelectFieldOffice);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateFieldOfficeSuccess(), onError, "Open Work Filters", "Open Work Filters", "FieldOffice", "");
+        }
+
+        if(SelectFaultedYesterday.length > 0) {
+            verivo.setControlValue(UpdateFaultedYesterdaySuccess(), onError, "Open Work Filters", "Open Work Filters", "FaultedYesterday", SelectFaultedYesterday);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateFaultedYesterdaySuccess(), onError, "Open Work Filters", "Open Work Filters", "FaultedYesterday", "");
+        }
+
+        if(CheckboxFavorite.length > 0) {
+            verivo.setControlValue(UpdateFavoriteSuccess(), onError, "Open Work Filters", "Open Work Filters", "Favorite", CheckboxFavorite);
+            callbackTotal++;
+        } else {
+            verivo.setControlValue(UpdateFavoriteSuccess(), onError, "Open Work Filters", "Open Work Filters", "Favorite", "");
+        }
+
+        clearTimeout(timerAction);
+        timerAction = setTimeout(PerformNavigation(10,navigationJSONObject), 1000);
     } else if(Results == 'Map') {
         var c_SRs = GetCSRS('List');
         var SelectMQSReps = GetSelectControl("FormOpenWorksFilter", "SelectMQSReps", "sapNo", "List", 0, 'String');
@@ -9938,6 +10027,60 @@ function Save() {
 
         verivo.navigate(onSuccessNavigate, onError, "Open Work Maps (Filter)", "Open Work Maps (Filter)", navigationJSONObject);
     }
+}
+
+function PerformNavigation(numberofcalls, navigationJSONObject) {
+    if (callbackCount != numberofcalls) {
+        //Return from this method if not all callbacks are returned. This API will be called again when the timer fires
+        return;
+    }
+    //Continue to save once after all callbacks have returned
+
+    callbackCount = 0;
+    //Disable the timer
+    clearTimeout(timerAction);
+
+    verivo.navigate(onSuccessNavigate, onError, "Open Work Filtered List", "Open Work Filtered List", navigationJSONObject);
+}
+
+function Updatec_SRsSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateMQSRepsSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateDueWeekSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateCountySuccess(value) {
+    callbackCount++;
+}
+
+function UpdateMeterTypeSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateScheduledSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateFieldAreaSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateFieldOfficeSuccess(value) {
+    callbackCount++;
+}
+
+function UpdateFaultedYesterdaySuccess(value) {
+    callbackCount++;
+}
+
+function UpdateFavoriteSuccess(value) {
+    callbackCount++;
 }
 
 function UpdateSQL(SQL, Value) {
@@ -10280,6 +10423,7 @@ function GetSelectControl(FormName, SelectControlName, ColumnName, ResultType, A
 }
 
 function ClearAll() {
+    //Clear controls on the screen
     ClearSelectControl("FormOpenWorksFilter", "SelectOpenWorkFilter");
     ClearSelectControl("FormOpenWorksFilter", "SelectServiceRequestType");
     ClearSelectControl("FormOpenWorksFilter", "SelectDueDateMonth");
@@ -10291,8 +10435,19 @@ function ClearAll() {
     ClearSelectControl("FormOpenWorksFilter", "SelectFieldArea");
     ClearSelectControl("FormOpenWorksFilter", "SelectFieldOffice");
     ClearSelectControl("FormOpenWorksFilter", "SelectFaultedYesterday");
-}
 
+    //Clear the filter fields used for maps
+    verivo.setControlValue(Updatec_SRsSuccess(), onError, "Open Work Filters", "Open Work Filters", "c_SRs", "");
+    verivo.setControlValue(UpdateMQSRepsSuccess(), onError, "Open Work Filters", "Open Work Filters", "MQSReps", "");
+    verivo.setControlValue(UpdateDueWeekSuccess(), onError, "Open Work Filters", "Open Work Filters", "DueWeek", "");
+    verivo.setControlValue(UpdateCountySuccess(), onError, "Open Work Filters", "Open Work Filters", "County", "");
+    verivo.setControlValue(UpdateMeterTypeSuccess(), onError, "Open Work Filters", "Open Work Filters", "MeterType", "");
+    verivo.setControlValue(UpdateScheduledSuccess(), onError, "Open Work Filters", "Open Work Filters", "Scheduled", "");
+    verivo.setControlValue(UpdateFieldAreaSuccess(), onError, "Open Work Filters", "Open Work Filters", "FieldArea", "");
+    verivo.setControlValue(UpdateFieldOfficeSuccess(), onError, "Open Work Filters", "Open Work Filters", "FieldOffice", "");
+    verivo.setControlValue(UpdateFaultedYesterdaySuccess(), onError, "Open Work Filters", "Open Work Filters", "FaultedYesterday", "");
+    verivo.setControlValue(UpdateFavoriteSuccess(), onError, "Open Work Filters", "Open Work Filters", "Favorite", "");
+}
 
 function ClearSelectControl(FormName, SelectControlName) {
     var Form = document.forms[FormName];
