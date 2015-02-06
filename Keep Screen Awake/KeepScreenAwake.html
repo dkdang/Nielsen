@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test to keep iOS devices always awake with fake redirects</title>
+</head>
+</html>
+
+<script>
+    iosSleepPreventInterval = setInterval(function () {
+        window.location.href = "/new/page";
+        window.setTimeout(function () {
+            window.stop()
+        }, 0);
+    }, 20000);
+</script>
+
